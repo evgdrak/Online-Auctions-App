@@ -1,0 +1,103 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" style="background-color: skyblue;" (click)="navigate('/search', '')">Categories</button>
+    <div class="dropdown-content">
+      <a (click)="navigate('/search', 'Art')">Art</a>
+      <a (click)="navigate('/search', 'Electronics')">Electronics</a>
+      <a (click)="navigate('/search', 'Fashion')">Fashion</a>
+      <a (click)="navigate('/search', 'Home & Garden')">Home & Garden</a>
+      <a (click)="navigate('/search', 'Music')">Music</a>
+      <a (click)="navigate('/search', 'Sports')">Sports</a>
+      <a (click)="navigate('/search', 'Toys & Hobbies')">Toys & Hobbies</a>
+      <a (click)="navigate('/search', 'Other')">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" class="inp" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" (click)="searchByDescription(searchText)">Go</button>
+  </div>
+  <div class="topnav-right" *ngIf="checkForUser(); else isGuest" style="text-align: right">  <!-- if user is logged in -->
+    <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>
+    <div  class="topnav-right" *ngIf="!checkForAdmin()" style="text-align: right">    <!-- options only for users (not admin) -->
+      <a [routerLink]="['/bid-item']" style="float: right">My Bids</a>
+      <a [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+    </div>
+
+    <a [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+
+    <div class="topnav-right" *ngIf="checkForAdmin()" style="text-align: right">    <!-- if admin is logged in -->
+      <a [routerLink]="['/users']" style="float: right">List of Users</a>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #isGuest>
+  <a [routerLink]="['/login']" style="float: right">Login</a>
+  <a [routerLink]="['/register']" style="float: right">Sign Up</a>
+</ng-template>
+
+<div class="block">                                     <!-- show search filters -->
+  <label style="color: white">Category:</label>
+  <select [(ngModel)]="category">
+    <option value="Art">Art</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Fashion">Fashion</option>
+    <option value="Home & Garden">Home & Garden</option>
+    <option value="Music">Music</option>
+    <option value="Sports">Sports</option>
+    <option value="Toys & Hobbies">Toys & Hobbies</option>
+    <option value="Other Categories">Other</option>
+  </select>
+
+  <label style="margin-left: 16px; color: white">Min value($):</label>
+  <input type="text" placeholder="{{ value_min }}" [(ngModel)]="value_min">
+
+  <label style="color: white">Max value($):</label>
+  <input type="text" placeholder="{{ value_max }}" [(ngModel)]="value_max">
+
+  <label style="color: white">Location:</label>
+  <input type="text" placeholder="{{ location }}" [(ngModel)]="location">
+
+  <button (click)="newSearch(1,10)">Search</button>
+
+</div>
+
+<br><br>
+
+<div class="table">
+  <table class="items">                                 <!-- show search results -->
+    <ng-container *ngFor="let it of items_photos">
+      <tr style="width: available;">
+        <td rowspan="4" style="text-align: center;"><img *ngIf="it.photos.length !== 0" [src]="it.photos[0].url"></td>
+        <td >{{it.item.name}}</td>
+      </tr>
+      <tr><td>
+        <ng-container *ngFor="let ctg of it.item.categories">
+            - {{ ctg.name }}
+        </ng-container></td>
+      </tr>
+      <tr>
+        <td>Current bid: {{it.item.currently}} $ </td>
+      </tr>
+      <tr colspan="2">
+        <td>Ends: {{it.item.ends | date:'medium' }}
+          <button style="float: right"><a style="color: white; text-decoration: none" [routerLink]="['/bid-item', it.item.id]">Place a bid</a></button></td>
+      </tr>
+      <br>
+    </ng-container>
+  </table>
+</div>
+
+<div *ngIf="itemsExist()">
+  <div class="center">
+  <div class="pagination">
+    <button class="pages" (click)="newSearch(page - 1, limit)">previous</button>
+    <button class="pages" *ngFor="let page of pages" (click)="newSearch(page, limit)">
+      <div class="active" *ngIf="thisPage(page)">{{page}}</div>
+      <div *ngIf="thisPage(page) === false">{{page}}</div>
+    </button>
+    <button class="pages" (click)="newSearch(page + 1, limit)">next</button>
+  </div></div>
+</div>

@@ -1,0 +1,34 @@
+<div class="wrapper">
+
+  <div class="block">
+
+    <form [formGroup]="register">
+      <h2>SIGN UP</h2>
+      <input type="text" placeholder="Username" class="inp" formControlName="username">
+      <input type="password" placeholder="Password" class="inp" formControlName="password">
+      <input type="text" placeholder="First Name" class="inp" formControlName="firstName">
+      <input type="text" placeholder="Last Name" class="inp" formControlName="lastName">
+      <input type="text" placeholder="Email" class="inp" formControlName="email">
+      <input type="text" placeholder="Phone" class="inp" formControlName="phone">
+      <input type="text" placeholder="Address" class="inp" formControlName="address">
+      <input type="text" placeholder="City" class="inp" formControlName="city">
+      <input type="text" placeholder="Country" class="inp" formControlName="country">
+      <input type="text" placeholder="TIN" class="inp" formControlName="tin">
+      <br>
+      <div class="btn">
+        <button (click)="registerNewUser(register.value)" [disabled]="register.invalid">Sign Up</button>
+        <button [routerLink]="['/login']">Login</button>
+      </div>
+
+      <br>
+      <nav>
+        <a style="color: white" [routerLink]="['/home']">Continue as a guest</a>
+      </nav>
+      <br>
+      <router-outlet></router-outlet>
+
+    </form>
+
+  </div>
+
+</div>

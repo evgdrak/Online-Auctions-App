@@ -1,0 +1,50 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, ends_min: now}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10, ends_min: now}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10, ends_min: now}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10, ends_min: now}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10, ends_min: now}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10, ends_min: now}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10, ends_min: now}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10, ends_min: now}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10, ends_min: now}">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" class="inp" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+  <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>         <!-- only users have access here (not admin) -->
+  <a class="active" [routerLink]="['/bid-item']"  style="float: right">My Bids</a>
+  <a [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+  <a [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+</div>
+
+
+<br><br>
+<div class="table">
+  <table class="items">
+    <ng-container *ngFor="let it of items_photos">
+      <tr>
+        <td rowspan="4" style="text-align: center;"><img *ngIf="it.photos.length !== 0" [src]="it.photos[0].url"></td>
+        <td>{{it.item.name}}</td>
+      </tr>
+      <tr><td>
+        <ng-container *ngFor="let ctg of it.item.categories">
+          - {{ ctg.name }}
+        </ng-container></td>
+      </tr>
+      <tr>
+        <td>Current bid: {{it.item.currently}} $ </td>
+      </tr>
+      <tr colspan="2">
+        <td>Ends: {{it.item.ends | date:'medium' }}
+          <button style="float: right"><a style="color: white; text-decoration: none" [routerLink]="['/bid-item', it.item.id]">Place a bid</a></button></td>
+      </tr>
+      <br>
+    </ng-container>
+  </table>
+</div>

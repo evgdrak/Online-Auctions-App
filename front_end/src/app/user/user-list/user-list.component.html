@@ -1,0 +1,63 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, ends_min: now}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10, ends_min: now}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10, ends_min: now}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10, ends_min: now}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10, ends_min: now}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10, ends_min: now}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10, ends_min: now}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10, ends_min: now}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10, ends_min: now}">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" class="inp" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+  <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>
+  <!--<a [routerLink]="['/bid-item']" style="float: right">Bid Items</a>
+  <a [routerLink]="['/sell-item']" style="float: right">Sell Items</a>-->
+  <a [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+  <a class="active" [routerLink]="['/users']" style="float: right">List of Users</a>
+</div>
+
+<div class="table">  <!-- if user is logged in -->
+  <table class="users">
+    <tr>
+      <th>Username</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>City</th>
+      <th>Country</th>
+      <th>Location</th>
+      <th>TIN</th>
+      <th>Role</th>
+      <th>Verified</th>
+    </tr>
+    <tr *ngFor="let user of users">
+      <td>{{user.username}}</td>
+      <td>{{user.firstName}}</td>
+      <td>{{user.lastName}}</td>
+      <td>{{user.email}}</td>
+      <td>{{user.phone}}</td>
+      <td>{{user.address}}</td>
+      <td>{{user.city}}</td>
+      <td>{{user.country}}</td>
+      <td>{{user.tin}}</td>
+      <td>{{user.role}}</td>
+      <td>
+        <div *ngIf="isVerified(user.verified)">
+          <input type="checkbox" id="verified" checked (change)="updateUser(user)">
+        </div>
+        <div *ngIf="isVerified(user.verified) == false">
+          <input type="checkbox" id="notverified" (change)="updateUser(user)">
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

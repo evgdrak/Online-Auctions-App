@@ -1,0 +1,14 @@
+p{
+  text-align: center;
+}
+
+button{
+  padding: 15px 10px;
+  background-color: navy;
+  margin-right: 5px;
+  color: white;
+  font-weight: 600;
+  border: none;
+  width: 200px;
+  cursor: pointer;
+}

@@ -1,0 +1,91 @@
+<div class="topnav">
+  <a class="active" [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, ends_min: now}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10, ends_min: now}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10, ends_min: now}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10, ends_min: now}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10, ends_min: now}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10, ends_min: now}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10, ends_min: now}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10, ends_min: now}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10, ends_min: now}">Other</a>
+    </div>
+  </div>
+
+  <div class="buttonIn">
+    <input style="float: left" type="text" class="inp" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+
+  <div class="topnav-right" *ngIf="checkForUser(); else isGuest" style="text-align: right">  <!-- if user is logged in -->
+    <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>
+    <div  class="topnav-right" *ngIf="!checkForAdmin()" style="text-align: right">    <!-- options only for users (not admin) -->
+      <a [routerLink]="['/bid-item']" style="float: right">My Bids</a>
+      <a [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+    </div>
+
+    <a [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+
+    <div class="topnav-right" *ngIf="checkForAdmin()" style="text-align: right">    <!-- if admin is logged in -->
+      <a [routerLink]="['/users']" style="float: right">List of Users</a>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #isGuest>
+  <a [routerLink]="['/login']" style="float: right">Login</a>
+  <a [routerLink]="['/register']" style="float: right">Sign Up</a>
+</ng-template>
+
+
+<div *ngIf="checkForAdmin()" style="margin-top: 15px">
+  <button (click)="exportJSON()" style="width: auto; background-color: midnightblue">Export auctions JSON</button>
+  <button (click)="exportXML()" style="width: auto; background-color: midnightblue">Export auctions XML</button>
+</div>
+
+
+<div>
+  <div class="alert" *ngIf="checkForUser() && unreadMessages()">
+    <span class="no_of_messages" (click)="redirect('/messages/user/' + getUserName())">
+      You have {{this.new_messages}} new message(s) (Click to see them)
+    </span>
+  </div>
+</div>
+
+<br><br>
+<a [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, orderby: 'ends', ends_min: now}">View auctions ending soon ></a>
+<div class="row">
+  <div class="column" *ngFor="let it of end_item_photos">       <!-- it: {Item, Photos[]} -->
+    <table>
+      <tr> <td style="text-align: center"><img *ngIf="it.photos.length !== 0" [src]="it.photos[0].url"></td> </tr>
+      <tr><td><a [routerLink]="['/bid-item', it.item.id]">{{it.item.name}}</a></td></tr>
+      <tr>
+        <td>Current bid: {{it.item.currently}} $ </td>
+      </tr>
+      <tr>
+        <td>Ends: {{it.item.ends | date:'medium' }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<br>
+<a [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, orderby: '-started', ends_min: now}">View newest auctions ></a>
+<div class="row">
+  <div class="column" *ngFor="let it of new_item_photos">     <!-- it: {Item, Photos[]} -->
+    <table>
+        <tr><td style="text-align: center"><img *ngIf="it.photos.length !== 0" [src]="it.photos[0].url"></td></tr>
+      <tr><td><a [routerLink]="['/bid-item', it.item.id]">{{it.item.name}}</a></td></tr>
+        <tr>
+          <td>Current bid: {{it.item.currently}} $ </td>
+        </tr>
+        <tr>
+          <td>Ends: {{it.item.ends | date:'medium' }}</td>
+        </tr>
+    </table>
+  </div>
+</div>
+

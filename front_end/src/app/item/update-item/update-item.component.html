@@ -1,0 +1,120 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, ends_min: now}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10, ends_min: now}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10, ends_min: now}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10, ends_min: now}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10, ends_min: now}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10, ends_min: now}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10, ends_min: now}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10, ends_min: now}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10, ends_min: now}">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+  <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>                 <!-- only have access in this page (not admin) -->
+  <a [routerLink]="['/bid-item']" style="float: right">My Bids</a>
+  <a class="active" [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+  <a [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+</div>
+
+<br>
+<button style="background-color: midnightblue; width: fit-content; border-radius: 12px;"><a [routerLink]="['/sell-item']" style="float: left; color: white; align-content: center; text-decoration: none">Back</a></button>
+
+<div class="iteminfo">
+  <div class="block" style="width: 80%">          <!-- show item details -->
+    <form [formGroup]="updateForm">
+      <div class="input">
+        <label>Name</label>
+        <input type='text' value="{{itemInfo.name}}" formControlName="name" required readonly/>
+      </div>
+      <label>Categories</label>
+      <table formArrayName="categories">
+        <div *ngFor="let ctg of categories.controls; let i = index" [formGroupName]="i">
+          <tr colspan="2">
+            <td><select formControlName="name">
+              <option value="{{ i }}" selected></option>
+              <option value="Art">Art</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & Garden">Home & Garden</option>
+              <option value="Music">Music</option>
+              <option value="Sports">Sports</option>
+              <option value="Toys & Hobbies">Toys & Hobbies</option>
+              <option value="Other Categories">Other Categories</option>
+            </select></td>
+
+            <td><button *ngIf="i===0" style="width: auto; margin-left: 50px" (click)="addCategory()">Add</button></td>
+            <td><button *ngIf="i!==0" style="background-color: indianred; width: auto; margin-left: 50px" (click)="removeCategory(i)">Remove</button></td>
+          </tr>
+        </div>
+      </table>
+      <div class="input">
+        <label>Country</label>
+        <input type='text' value="{{itemInfo.country}}" formControlName="country" required/>
+      </div>
+      <div class="input">
+        <label>Buy price</label>
+        <input type='text' value="{{itemInfo.buy_price}}" formControlName="buy_price" required/>
+      </div>
+      <div class="input">
+        <label>First Bid</label>
+        <input type='text' value="{{itemInfo.first_bid}}" formControlName="first_bid" required/>
+      </div>
+      <div class="input">
+        <label>Rating</label>
+        <input type='text' value="{{itemInfo.rating}}" formControlName="rating" required/>
+      </div>
+      <div class="input">
+        <label>Ends</label>
+        <input type='datetime-local' value="{{itemInfo.ends }}" formControlName="ends" required/>
+      </div>
+      <div class="input">
+        <label>Description</label>
+        <textarea type='text' value="{{itemInfo.description}}" formControlName="description" required></textarea>
+      </div>
+      <div class="input">
+        <label>Location</label>
+        <input type="text" value="{{itemInfo.location}}" class="inp" formControlName="location">
+      </div>
+
+      <label style="color: white; font-family: sans-serif; margin-bottom: 10px">Choose location coordinates:</label>
+      <div class="map-container">
+        <div class="map-frame">
+          <div id="map"></div>
+        </div>
+      </div>
+
+
+      <label style="margin-top: 20px">Photos</label>
+      <table formArrayName="old_photos" style="margin-top: 5px">
+        <div *ngFor="let ph of old_photos.controls; let i = index" [formGroupName]="i">
+          <tr colspan="2">
+            <td style="color: white">{{ p_names[i] }}</td>
+            <td><button style="background-color: indianred; width: auto; margin-left: 50px" (click)="removeOldPhoto(i)">Remove</button></td>
+          </tr>
+        </div>
+      </table>
+
+      <table formArrayName="new_photos" style="margin-top: 20px">
+        <div *ngFor="let ph of new_photos.controls; let i = index" [formGroupName]="i">
+          <tr colspan="2">
+            <td><input type="file" accept="image/png, image/jpeg" style="color: white; padding: 10px;" multiple value="select" #selectFile (change)="onFileSelected($event,i)"></td>
+            <td><button *ngIf="i===0" style="width: auto; margin-left: 50px" (click)="addPhoto()">Add</button></td>
+            <td><button *ngIf="i!==0" style="background-color: indianred; width: auto; margin-left: 50px" (click)="removeNewPhoto(i)">Remove</button></td>
+          </tr>
+        </div>
+      </table>
+
+      <div style="margin-top: 20px" class="btn">
+        <button (click)="updateItem(updateForm.value)">Update</button>
+      </div>
+    </form>
+  </div>
+
+</div>

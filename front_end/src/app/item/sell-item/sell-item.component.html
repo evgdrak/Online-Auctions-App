@@ -1,0 +1,152 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, ends_min: now}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10, ends_min: now}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10, ends_min: now}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10, ends_min: now}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10, ends_min: now}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10, ends_min: now}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10, ends_min: now}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10, ends_min: now}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10, ends_min: now}">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+  <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>                 <!-- only users have access to this page (not admin) -->
+  <a [routerLink]="['/bid-item']" style="float: right">My Bids</a>
+  <a class="active" [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+  <a [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+</div>
+
+<br>
+<div >
+  <button style="background-color: midnightblue; border-radius: 12px;" (click)="changeVisibility()">Sell item</button>
+  <button style="background-color: midnightblue; width: fit-content; border-radius: 12px;" (click)="viewItems(1, 10)">Current items on sale</button>
+</div>
+
+<div *ngIf="sell;else view" class="wrapper" style="width: auto">        <!-- show form for selling an item -->
+  <div class="block">
+    <form [formGroup]="itemForm">
+      <h2>Sell new item</h2>
+      <input type="text" placeholder="Name" class="inp" formControlName="name">
+
+      <table formArrayName="categories">
+        <div *ngFor="let ctg of categories.controls; let i = index" [formGroupName]="i">
+          <tr colspan="2">
+            <td><select formControlName="name">
+              <option value="" selected>--Please select a category--</option>
+              <option value="Art">Art</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & Garden">Home & Garden</option>
+              <option value="Music">Music</option>
+              <option value="Sports">Sports</option>
+              <option value="Toys & Hobbies">Toys & Hobbies</option>
+              <option value="Other Categories">Other</option>
+            </select></td>
+           <td><button *ngIf="i===0" style="width: auto; margin-left: 50px" (click)="addCategory()">Add</button></td>
+            <td><button *ngIf="i!==0" style="background-color: indianred; width: auto; margin-left: 50px" (click)="removeCategory(i)">Remove</button></td>
+          </tr>
+        </div>
+      </table>
+
+      <input type="text" placeholder="Country" class="inp" formControlName="country">
+      <input type="text" placeholder="Buy price" class="inp" formControlName="buy_price">
+      <input type="text" placeholder="First bid" class="inp" formControlName="first_bid">
+      <input type="text" placeholder="Rating" class="inp" formControlName="rating">
+      <div>
+        <label style="color: white; font-family: sans-serif; text-align: left;">Ends:</label>
+        <input type="datetime-local" class="inp" formControlName="ends" style="width: 65%"/>
+      </div>
+      <input type="text" placeholder="Location name" class="inp" formControlName="location">
+      <label style="color: white; font-family: sans-serif; margin-bottom: 10px">Choose location coordinates:</label>
+      <div class="map-container">
+        <div class="map-frame">
+          <div id="map"></div>
+        </div>
+      </div>
+
+      <textarea type="text" placeholder="Description" class="inp" formControlName="description" style="box-sizing: content-box"></textarea>
+
+
+      <table formArrayName="photos">
+        <div *ngFor="let ph of photos.controls; let i = index" [formGroupName]="i">
+          <tr colspan="2">
+            <td><input type="file" accept="image/png, image/jpeg" style="color: white; padding: 10px;" multiple value="select" #selectFile (change)="onFileSelected($event,i)"></td>
+            <td><button *ngIf="i===0" style="width: auto; margin-left: 50px" (click)="addPhoto()">Add</button></td>
+            <td><button *ngIf="i!==0" style="background-color: indianred; width: auto; margin-left: 50px" (click)="removePhoto(i)">Remove</button></td>
+          </tr>
+        </div>
+      </table>
+
+
+      <div class="btn">
+        <button (click)="addItem(itemForm.value)" [disabled]="itemForm.invalid">Sell Item</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+<ng-template #view>             <!-- show list of items up for sale -->
+  <br><br>
+  <div class="table">
+    <table class="items">
+      <ng-container *ngFor="let it of items_photos">
+        <tr>
+          <td rowspan="7" style="text-align: center"><img *ngIf="it.photos.length !== 0" [src]="it.photos[0].url"></td>
+          <td>{{it.item.name}}</td>
+        </tr>
+        <tr><td>
+          <ng-container *ngFor="let ctg of it.item.categories">
+            - {{ ctg.name }}
+          </ng-container></td>
+        </tr>
+        <tr>
+          <td>Buy price: {{it.item.buy_price}} $ </td>
+        </tr>
+        <tr>
+          <td>Current bid: {{it.item.currently}} $ </td>
+        </tr>
+        <tr>
+          <td>Number of bids: {{it.item.number_of_bids}} </td>
+        </tr>
+        <tr>
+          <td>Rating: {{it.item.rating}} </td>
+        </tr>
+        <tr>
+          <td>Ends: {{it.item.ends | date:'medium' }}</td>
+        </tr>
+        <tr>
+          <button style="background-color: #5353b6; color: white; text-decoration: none" [routerLink]="['/bid-item', it.item.id]">View</button>
+          <button *ngIf="it.item.number_of_bids === 0" style="color: white; text-decoration: none" [routerLink]="['/sell-item', it.item.id]">Update</button>
+          <button *ngIf="it.item.number_of_bids === 0" style="background-color: indianred" (click)="deleteItem(it.item.id)">Delete</button>
+        </tr>
+
+        <br>
+      </ng-container>
+    </table>
+
+  </div>
+
+  <div class="center">
+    <div class="pagination">
+      <button class="pages" (click)="viewItems(page - 1, limit)">previous</button>
+      <button class="pages" *ngFor="let page of pages" (click)="viewItems(page, limit)">
+        <div class="active" *ngIf="thisPage(page)">{{page}}</div>
+        <div *ngIf="thisPage(page) === false">{{page}}</div>
+      </button>
+      <button class="pages" (click)="viewItems(page + 1, limit)">next</button>
+    </div>
+  </div>
+
+</ng-template>
+
+
+

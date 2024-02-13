@@ -1,0 +1,100 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10, ends_min: now}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10, ends_min: now}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10, ends_min: now}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10, ends_min: now}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10, ends_min: now}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10, ends_min: now}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10, ends_min: now}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10, ends_min: now}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10, ends_min: now}">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" class="inp" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+  <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>
+  <div class="topnav-right" *ngIf="!checkForAdmin()" style="text-align: right">
+    <a [routerLink]="['/bid-item']" style="float: right">My Bids</a>
+    <a [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+  </div>
+  <a class="active" [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+  <div class="topnav-right" *ngIf="checkForAdmin()" style="text-align: right">    <!-- if admin is logged in -->
+    <a [routerLink]="['/users']" style="float: right">List of Users</a>
+  </div>
+</div>
+
+<div class="tab">
+  <div class="top_tab">
+    <button (click)="redirect('/users/' + getUserName())">Info</button>
+    <button class="active_tab" (click)="redirect('/messages/user/' + getUserName())">Messages</button>
+  </div>
+  <div class="bottom_tab">
+    <button class="boxes" (click)="getInboxMessages(1, limit)">Inbox</button>
+    <button class="boxes" (click)="getOutboxMessages(1, limit)">Outbox</button>
+    <button class="boxes" (click)="redirect('/messages')" style="width: 150px;">New Message</button>
+  </div>
+</div>
+
+<div class="table">
+  <table class="messages">
+    <tr>
+      <th>Title</th>
+      <th>From</th>
+      <th>Date</th>
+    </tr>
+    <tr class="messages_data" *ngFor="let message of messages.results">
+      <td class="messages_row">
+        <div class="inbox" *ngIf="isInbox()">
+            <div *ngIf="message.opened === false" (click)="updateMessage(message)">
+              {{message.title}} <span>(new)</span>
+            </div>
+            <div *ngIf="message.opened === true" (click)="redirect('/messages/' + message.id)">
+              {{message.title}}
+            </div>
+        </div>
+        <div class="outbox" *ngIf="isInbox() === false" (click)="redirect('/messages/' + message.id)">
+          {{message.title}}
+        </div>
+      </td>
+      <td class="messages_row">
+        <div class="inbox" *ngIf="isInbox()">
+          <div *ngIf="message.opened === false" (click)="updateMessage(message)">
+            {{message.sender}}
+          </div>
+          <div *ngIf="message.opened === true" (click)="redirect('/messages/' + message.id)">
+            {{message.sender}}
+          </div>
+        </div>
+        <div class="outbox" *ngIf="isInbox() === false" (click)="redirect('/messages/' + message.id)">{{message.sender}}</div>
+      </td>
+      <td class="messages_row">
+        <div class="inbox" *ngIf="isInbox()">
+          <div *ngIf="message.opened === false" (click)="updateMessage(message)">
+            {{message.timestamp}}
+          </div>
+          <div *ngIf="message.opened === true" (click)="redirect('/messages/' + message.id)">
+            {{message.timestamp}}
+          </div>
+        </div>
+        <div class="outbox" *ngIf="isInbox() === false">{{message.timestamp}}</div>
+      </td>
+      <td class="delete" (click)="deleteMessage(message.id)">x</td>
+    </tr>
+  </table>
+</div>
+
+<div class="center">
+  <div class="pagination">
+    <button class="pages" (click)="getInboxMessages(page - 1, limit)">previous</button>
+    <button class="pages" *ngFor="let page of pages" (click)="getInboxMessages(page, limit)">
+      <div class="active" *ngIf="thisPage(page)">{{page}}</div>
+      <div *ngIf="thisPage(page) === false">{{page}}</div>
+    </button>
+    <button class="pages" (click)="getInboxMessages(page + 1, limit)">next</button>
+  </div>
+</div>

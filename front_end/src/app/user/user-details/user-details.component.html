@@ -1,0 +1,84 @@
+<div class="topnav">
+  <a [routerLink]="['/home']">Home</a>
+  <div class="dropdown">
+    <button class="dropbtn" [routerLink]="['/search']" [queryParams]="{ page: 1, limit: 10}">Categories</button>
+    <div class="dropdown-content">
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Art', page: 1, limit: 10}">Art</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Electronics', page: 1, limit: 10}">Electronics</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Fashion', page: 1, limit: 10}">Fashion</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Home & Garden', page: 1, limit: 10}">Home & Garden</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Music', page: 1, limit: 10}">Music</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Sports', page: 1, limit: 10}">Sports</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Toys & Hobbies', page: 1, limit: 10}">Toys & Hobbies</a>
+      <a [routerLink]="['/search']" [queryParams]="{ category: 'Other Categories', page: 1, limit: 10}">Other</a>
+    </div>
+  </div>
+  <div class="buttonIn">
+    <input style="float: left" type="text" class="inp" placeholder="Search..." [(ngModel)]="searchText" required>
+    <button style="background-color: darkseagreen" [routerLink]="['/search']" [queryParams]="{ description: searchText }">Go</button>
+  </div>
+  <a (click)="logout()" style="background-color: slateblue; float: right;">Logout</a>
+  <div class="topnav-right" *ngIf="!checkForAdmin()" style="text-align: right">
+    <a [routerLink]="['/bid-item']" style="float: right">My Bids</a>
+    <a [routerLink]="['/sell-item']" style="float: right">Sell Items</a>
+  </div>
+
+  <a class="active" [routerLink]="['/users/' + getUserName()]" style="float: right">User Profile <span *ngIf="unreadMessages()">({{new_messages}})</span></a>
+  <div class="topnav-right" *ngIf="checkForAdmin()" style="text-align: right">    <!-- if admin is logged in -->
+    <a [routerLink]="['/users']" style="float: right">List of Users</a>
+  </div>
+</div>
+
+<div class="tab">
+  <button class="active_tab" (click)="redirect('/users/' + getUserName())">Info</button>
+  <button (click)="redirect('/messages/user/' + getUserName())">Messages</button>
+</div>
+
+<div class="userinfo">
+  <h2>User {{user.username}}</h2>
+  <form [formGroup]="userForm">
+    <!--<div class="input">
+      <label>Username</label>
+      <input type='text' value="{{user.username}}" formControlName="username" required readonly/>
+    </div>-->
+    <div class="user_info">
+      <label>First Name</label>
+      <input type='text' class="use_details" value="{{user.firstName}}" formControlName="firstName" required>
+    </div>
+    <div class="user_info">
+      <label>Last Name</label>
+      <input type='text' class="use_details" value="{{user.lastName}}" formControlName="lastName" required/>
+    </div>
+    <div class="user_info">
+      <label>Email</label>
+      <input type='text' class="use_details" value="{{user.email}}" formControlName="email" required/>
+    </div>
+    <div class="user_info">
+      <label>Phone</label>
+      <input type='text' class="use_details" value="{{user.phone}}" formControlName="phone" required/>
+    </div>
+    <div class="user_info">
+      <label>Address</label>
+      <input type='text' class="use_details" value="{{user.address}}" formControlName="address" required/>
+    </div>
+    <div class="user_info">
+      <label>City</label>
+      <input type='text' class="use_details" value="{{user.city}}" formControlName="city" required/>
+    </div>
+    <div class="user_info">
+      <label>Country</label>
+      <input type='text' class="use_details" value="{{user.country}}" formControlName="country" required/>
+    </div>
+    <div class="user_info">
+      <label>TIN</label>
+      <input type='text' class="use_details" value="{{user.tin}}" formControlName="tin" required/>
+    </div>
+    <div class="user_info">
+      <label>Role</label>
+      <input type='text' class="use_details" value="{{user.role}}" formControlName="role" readonly/>
+    </div>
+    <div class="btn">
+      <button (click)="updateUser(userForm.value)">Update</button>
+    </div>
+  </form>
+</div>

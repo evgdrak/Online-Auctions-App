@@ -1,0 +1,23 @@
+<div class="wrapper">
+
+  <div class="block">
+
+    <form [formGroup]="login">
+      <h2>LOGIN</h2>
+      <input type="text" placeholder="Username" class="inp" formControlName="username">
+      <input type="password" placeholder="Password" class="inp" formControlName="password">
+      <div class="btn">
+        <button (click)="loginSubmit(login.value)" [disabled]="login.invalid">Login</button>
+        <button [routerLink]="['/register']">Sign Up</button>
+      </div>
+
+      <br>
+      <nav>
+        <a style="color: white" routerLink="/home">Continue as a guest</a>
+      </nav>
+      <router-outlet></router-outlet>
+
+    </form>
+  </div>
+</div>
+
